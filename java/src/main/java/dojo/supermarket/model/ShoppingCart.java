@@ -24,6 +24,7 @@ public class ShoppingCart {
     }
 
     public void addItemQuantity(Product product, double quantity) {
+        items.stream().filter(productQ -> productQ.productEquals(product)).count();
         items.add(new ProductQuantity(product, quantity));
         if (productQuantities.containsKey(product)) {
             productQuantities.put(product, productQuantities.get(product) + quantity);
