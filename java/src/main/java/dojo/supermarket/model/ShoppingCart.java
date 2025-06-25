@@ -15,6 +15,7 @@ public class ShoppingCart {
         return Collections.unmodifiableList(items);
     }
 
+    // FIXME - dead code, Speculative Generality. Writing more means more possibility of bugs
     void addItem(Product product) {
         addItemQuantity(product, 1.0);
     }
@@ -24,7 +25,7 @@ public class ShoppingCart {
     }
 
     public void addItemQuantity(Product product, double quantity) {
-        items.stream().filter(productQ -> productQ.productEquals(product)).count();
+        items.stream().filter(productQ -> productQ.productEquals(product)).count(); // FIXME - dead code
         items.add(new ProductQuantity(product, quantity));
         if (productQuantities.containsKey(product)) {
             productQuantities.put(product, productQuantities.get(product) + quantity);
@@ -33,6 +34,7 @@ public class ShoppingCart {
         }
     }
 
+    // FIXME - Long Method
     void handleOffers(Receipt receipt, Map<Product, Offer> offers, SupermarketCatalog catalog) {
         for (Product p: productQuantities().keySet()) {
             double quantity = productQuantities.get(p);
@@ -41,7 +43,7 @@ public class ShoppingCart {
                 double unitPrice = catalog.getUnitPrice(p);
                 int quantityAsInt = (int) quantity;
                 Discount discount = null;
-                int x = 1;
+                int x = 1;  // FIXME - Variable with Long Scope, Mysterious names
                 if (offer.offerType == SpecialOfferType.THREE_FOR_TWO) {
                     x = 3;
 
@@ -58,7 +60,7 @@ public class ShoppingCart {
                 }
                 int numberOfXs = quantityAsInt / x;
                 if (offer.offerType == SpecialOfferType.THREE_FOR_TWO && quantityAsInt > 2) {
-                    double discountAmount = quantity * unitPrice - ((numberOfXs * 2 * unitPrice) + quantityAsInt % 3 * unitPrice);
+                    double discountAmount = quantity * unitPrice - ((numberOfXs * 2 * unitPrice) + quantityAsInt % 3 * unitPrice); //FIXME - Complex Expression(Long class/method)/ primitive expression
                     discount = new Discount(p, "3 for 2", -discountAmount);
                 }
                 if (offer.offerType == SpecialOfferType.TEN_PERCENT_DISCOUNT) {

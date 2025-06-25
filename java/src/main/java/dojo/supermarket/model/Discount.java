@@ -2,6 +2,8 @@ package dojo.supermarket.model;
 
 public class Discount {
 
+    // FIXME - Data Class. true power of objects is that they can contain behavior types or operations on their data
+
     private final String description;
     private final double discountAmount;
     private final Product product;

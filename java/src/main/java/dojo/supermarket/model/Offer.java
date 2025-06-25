@@ -2,6 +2,8 @@ package dojo.supermarket.model;
 
 public class Offer {
 
+    // FIXME - Data Class. true power of objects is that they can contain behavior types or operations on their data
+
     SpecialOfferType offerType;
     private final Product product;
     double argument;
@@ -12,6 +14,7 @@ public class Offer {
         this.product = product;
     }
 
+    // FIXME - dead code
     Product getProduct() {
         return product;
     }
