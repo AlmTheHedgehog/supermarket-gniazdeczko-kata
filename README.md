@@ -29,19 +29,23 @@ The supermarket runs special deals, e.g.
 These are just examples: the actual products in special deals change each week.
 
 
+## A new feature
+
+Now supermarket starts selling products in bundles. You can get additional
+Discount buying a whole bundle.
+
+For example, there is a special offer for buying toothpaste and toothbrush together.
+```math
+1 * 13zl + 1 * 25.99zl = 38.99zl - 10\%
+```
+```math
+1 * 13zl + 2 * 25.99zl = (38.99zl - 10\%) + 25.99zl
+```
 
 
 
-
-
-
-
-
-
-
----
 
 refs:
 - [Supermarket Receipt - Kata](https://sammancoaching.org/kata_descriptions/supermarket_receipt.html)
 - [Refactoring guru - code smells, design patterns](https://refactoring.guru/)
-- [Code Smells Catalog](https://luzkan.github.io/smells) 
+- [Code Smells Catalog](https://luzkan.github.io/smells)
