@@ -143,7 +143,9 @@ class SupermarketTest {
         double toothbrushQuantity = 3;
         double expectedProductTotalPrice = 3.0;
         double expectedTotalPrice = 2.0;
-        teller.addSpecialOffer(SpecialOfferType.THREE_FOR_TWO, TOOTHBRUSH, 0);
+
+        int notUsed = 0;
+        teller.addSpecialOffer(SpecialOfferType.THREE_FOR_TWO, TOOTHBRUSH, notUsed);
         ShoppingCart cart = toothbrushesCart(toothbrushQuantity);
 
         //when
@@ -168,6 +170,33 @@ class SupermarketTest {
         double expectedProductTotalPrice = 5.0;
         double expectedTotalPrice = 3.0;
         teller.addSpecialOffer(SpecialOfferType.FIVE_FOR_AMOUNT, TOOTHBRUSH, 3*TOOTHBRUSH_PRICE);
+        ShoppingCart cart = toothbrushesCart(toothbrushQuantity);
+
+        //when
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        //then
+        assertEquals(1, receipt.getItems().size());
+
+        ReceiptItem receiptItem = receipt.getItems().get(0);
+        assertEquals(TOOTHBRUSH, receiptItem.getProduct());
+        assertEquals(TOOTHBRUSH_PRICE, receiptItem.getPrice());
+        assertEquals(expectedProductTotalPrice, receiptItem.getTotalPrice());
+        assertEquals(toothbrushQuantity, receiptItem.getQuantity());
+
+        assertEquals(expectedTotalPrice, receipt.getTotalPrice(), 0.01);
+    }
+
+    @Test
+    void should_applyOnlyTheLastDiscountForGivenProduct() {
+        //given
+        double toothbrushQuantity = 5;
+        double expectedProductTotalPrice = 5.0;
+        double expectedTotalPrice = 3.0;
+        int notUsed = 0;
+        teller.addSpecialOffer(SpecialOfferType.THREE_FOR_TWO, TOOTHBRUSH, notUsed);
+        teller.addSpecialOffer(SpecialOfferType.FIVE_FOR_AMOUNT, TOOTHBRUSH, 3*TOOTHBRUSH_PRICE);
+
         ShoppingCart cart = toothbrushesCart(toothbrushQuantity);
 
         //when
