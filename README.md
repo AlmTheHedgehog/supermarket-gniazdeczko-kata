@@ -33,11 +33,30 @@ These are just examples: the actual products in special deals change each week.
 
 
 
+## Discovered issues
+
+### Code smells
+- wrong variable name
+  - ShoppingCart.handleOffers 'x'
+  - ShoppingCart.handleOffers 'numberOfXs'
+- argument field in Offer is not descriptive
+- variable usage not directly after declaration (argument)
 
 
+### Bad design
+- ShoppingCart.handleOffers cyclomatic complexity(10)
+- ShoppingCart.handleOffers accidental complexity
+- lack of tests
+- tenPercentDiscount does not test described behaviour
+- receiptItem leaking encapsulation
+- lack of unit test, testing unit things on integration level
 
 
-
+## Applied changes
+- initial tenPercentDiscount test is renamed to should_notApplyDiscountForNotDiscountedProduct as it better describes tested bahaviour
+- should_notApplyDiscountForNotDiscountedProduct tested too much, basic happy path for total price calculation was extracted as should_calculateTotalPrice
+- magic numbers removal, replaces with variables or constants
+- fixed order of assertions
 
 ---
 

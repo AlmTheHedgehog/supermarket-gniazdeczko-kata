@@ -1,44 +1,71 @@
 package dojo.supermarket.model;
 
-import dojo.supermarket.ReceiptPrinter;
-import org.approvaltests.Approvals;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SupermarketTest {
 
     // Todo: test all kinds of discounts are applied properly
+    private static final Product TOOTHBRUSH = new Product("toothbrush", ProductUnit.EACH);
+    private static final Product APPLES = new Product("apples", ProductUnit.KILO);
+    private static final double APPLES_PRICE = 1.99;
+
+
+    SupermarketCatalog catalog = new FakeCatalog();
+
+    Teller teller = new Teller(catalog);
+
+    @BeforeEach
+    void setUp() {
+        catalog.addProduct(TOOTHBRUSH, 0.99);
+        catalog.addProduct(APPLES, APPLES_PRICE);
+    }
 
     @Test
-    void tenPercentDiscount() {
-        SupermarketCatalog catalog = new FakeCatalog();
-        Product toothbrush = new Product("toothbrush", ProductUnit.EACH);
-        catalog.addProduct(toothbrush, 0.99);
-        Product apples = new Product("apples", ProductUnit.KILO);
-        catalog.addProduct(apples, 1.99);
-
-        Teller teller = new Teller(catalog);
-        teller.addSpecialOffer(SpecialOfferType.TEN_PERCENT_DISCOUNT, toothbrush, 10.0);
-
+    void should_calculateTotalPrice() {
+        //given
+        double applesQuantity = 2.5;
+        double expectedTotalPrice = applesQuantity*APPLES_PRICE;
         ShoppingCart cart = new ShoppingCart();
-        cart.addItemQuantity(apples, 2.5);
-        
-        // ACT
+        cart.addItemQuantity(APPLES, applesQuantity);
+
+        //when
         Receipt receipt = teller.checksOutArticlesFrom(cart);
 
-        // ASSERT
-        assertEquals(4.975, receipt.getTotalPrice(), 0.01);
-        assertEquals(Collections.emptyList(), receipt.getDiscounts());
+        //then
         assertEquals(1, receipt.getItems().size());
-        ReceiptItem receiptItem = receipt.getItems().get(0);
-        assertEquals(apples, receiptItem.getProduct());
-        assertEquals(1.99, receiptItem.getPrice());
-        assertEquals(2.5*1.99, receiptItem.getTotalPrice());
-        assertEquals(2.5, receiptItem.getQuantity());
 
+        ReceiptItem receiptItem = receipt.getItems().get(0);
+        assertEquals(APPLES, receiptItem.getProduct());
+        assertEquals(APPLES_PRICE, receiptItem.getPrice());
+        assertEquals(expectedTotalPrice, receiptItem.getTotalPrice());
+        assertEquals(applesQuantity, receiptItem.getQuantity());
+
+        assertEquals(expectedTotalPrice, receipt.getTotalPrice(), 0.01);
+    }
+
+    @Test
+    void should_notApplyDiscountForNotDiscountedProduct() {
+        //given
+        double discount = 10.0;
+        double applesQuantity = 2.5;
+        double expectedTotalPrice = applesQuantity*APPLES_PRICE;
+        teller.addSpecialOffer(SpecialOfferType.TEN_PERCENT_DISCOUNT, TOOTHBRUSH, discount);
+        ShoppingCart cart = new ShoppingCart();
+        cart.addItemQuantity(APPLES, applesQuantity);
+
+        //when
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        //then
+        assertEquals(1, receipt.getItems().size());
+        assertEquals(Collections.emptyList(), receipt.getDiscounts());
+        assertEquals(expectedTotalPrice, receipt.getTotalPrice(), 0.01);
     }
 
 
