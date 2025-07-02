@@ -49,7 +49,7 @@ class SupermarketTest {
     }
 
     @Test
-    void should_notApplyDiscountForNotDiscountedProduct() {
+    void should_notApplyDiscountForNotDiscountedProductWhenProductNotInCart() {
         //given
         double discount = 10.0;
         double applesQuantity = 2.5;
@@ -67,6 +67,28 @@ class SupermarketTest {
     }
 
     @Test
+    void should_notApplyDiscountForNotDiscountedProductWhenProductInCart() {
+        //given
+        double discountPercent = 10.0;
+        double toothbrushQuantity = 1;
+        double applesQuantity = 2.5;
+        double expectedDiscount = (toothbrushQuantity*TOOTHBRUSH_PRICE) *  discountPercent/100;
+        double expectedTotalPrice = applesQuantity*APPLES_PRICE + (toothbrushQuantity*TOOTHBRUSH_PRICE)-expectedDiscount;
+        teller.addSpecialOffer(SpecialOfferType.TEN_PERCENT_DISCOUNT, TOOTHBRUSH, discountPercent);
+
+        ShoppingCart cart = aAppleCart(applesQuantity);
+        cart.addItemQuantity(TOOTHBRUSH, toothbrushQuantity);
+
+        //when
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        //then
+        assertEquals(2, receipt.getItems().size());
+        assertEquals(1, receipt.getDiscounts().size());
+        assertEquals(expectedTotalPrice, receipt.getTotalPrice(), 0.01);
+    }
+
+    @Test
     void should_applyTenPercentDiscount() {
         //given
         double discountPercent = 10.0;
@@ -74,7 +96,7 @@ class SupermarketTest {
         double expectedProductPrice = TOOTHBRUSH_PRICE;
         double expectedTotalPrice = 0.9;
         teller.addSpecialOffer(SpecialOfferType.TEN_PERCENT_DISCOUNT, TOOTHBRUSH, discountPercent);
-        ShoppingCart cart = aSingleToothbrushCart();
+        ShoppingCart cart = toothbrushesCart(toothbrushQuantity);
 
         //when
         Receipt receipt = teller.checksOutArticlesFrom(cart);
@@ -95,11 +117,10 @@ class SupermarketTest {
     void should_applyTwoForOneDiscount() {
         //given
         double toothbrushQuantity = 2;
-        double expectedProductPrice = TOOTHBRUSH_PRICE;
         double expectedProductTotalPrice = 2.0;
         double expectedTotalPrice = 1.0;
         teller.addSpecialOffer(SpecialOfferType.TWO_FOR_AMOUNT, TOOTHBRUSH, TOOTHBRUSH_PRICE);
-        ShoppingCart cart = twoToothbrushesCart();
+        ShoppingCart cart = toothbrushesCart(toothbrushQuantity);
 
         //when
         Receipt receipt = teller.checksOutArticlesFrom(cart);
@@ -116,7 +137,53 @@ class SupermarketTest {
         assertEquals(expectedTotalPrice, receipt.getTotalPrice(), 0.01);
     }
 
+    @Test
+    void should_applyThreeForTwoDiscount() {
+        //given
+        double toothbrushQuantity = 3;
+        double expectedProductTotalPrice = 3.0;
+        double expectedTotalPrice = 2.0;
+        teller.addSpecialOffer(SpecialOfferType.THREE_FOR_TWO, TOOTHBRUSH, 0);
+        ShoppingCart cart = toothbrushesCart(toothbrushQuantity);
 
+        //when
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        //then
+        assertEquals(1, receipt.getItems().size());
+
+        ReceiptItem receiptItem = receipt.getItems().get(0);
+        assertEquals(TOOTHBRUSH, receiptItem.getProduct());
+        assertEquals(TOOTHBRUSH_PRICE, receiptItem.getPrice());
+        assertEquals(expectedProductTotalPrice, receiptItem.getTotalPrice());
+        assertEquals(toothbrushQuantity, receiptItem.getQuantity());
+
+        assertEquals(expectedTotalPrice, receipt.getTotalPrice(), 0.01);
+    }
+
+    @Test
+    void should_applyFiveForThreeDiscount() {
+        //given
+        double toothbrushQuantity = 5;
+        double expectedProductTotalPrice = 5.0;
+        double expectedTotalPrice = 3.0;
+        teller.addSpecialOffer(SpecialOfferType.FIVE_FOR_AMOUNT, TOOTHBRUSH, 3*TOOTHBRUSH_PRICE);
+        ShoppingCart cart = toothbrushesCart(toothbrushQuantity);
+
+        //when
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        //then
+        assertEquals(1, receipt.getItems().size());
+
+        ReceiptItem receiptItem = receipt.getItems().get(0);
+        assertEquals(TOOTHBRUSH, receiptItem.getProduct());
+        assertEquals(TOOTHBRUSH_PRICE, receiptItem.getPrice());
+        assertEquals(expectedProductTotalPrice, receiptItem.getTotalPrice());
+        assertEquals(toothbrushQuantity, receiptItem.getQuantity());
+
+        assertEquals(expectedTotalPrice, receipt.getTotalPrice(), 0.01);
+    }
 
     private static ShoppingCart aAppleCart(double applesQuantity) {
         ShoppingCart cart = new ShoppingCart();
@@ -124,17 +191,9 @@ class SupermarketTest {
         return cart;
     }
 
-    private static ShoppingCart aSingleToothbrushCart() {
+    private static ShoppingCart toothbrushesCart(double quantity) {
         ShoppingCart cart = new ShoppingCart();
-        cart.addItemQuantity(TOOTHBRUSH, 1);
+        cart.addItemQuantity(TOOTHBRUSH, quantity);
         return cart;
     }
-
-    private static ShoppingCart twoToothbrushesCart() {
-        ShoppingCart cart = new ShoppingCart();
-        cart.addItemQuantity(TOOTHBRUSH, 2);
-        return cart;
-    }
-
-
 }
