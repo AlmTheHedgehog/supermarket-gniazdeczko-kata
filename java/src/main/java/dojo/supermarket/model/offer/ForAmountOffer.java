@@ -1,7 +1,7 @@
 package dojo.supermarket.model.offer;
 
 import dojo.supermarket.model.Discount;
-import dojo.supermarket.model.Product;
+import dojo.supermarket.model.product.Product;
 
 public class ForAmountOffer implements Offer {
     
@@ -15,9 +15,9 @@ public class ForAmountOffer implements Offer {
     
     
     @Override
-    public Discount getDiscount(Product product, Double amountOfProduct, double productPrice) {
-        int viableForDiscount = amountOfProduct.intValue()/quantityInBundle;
-        double disAmount = (quantityInBundle*productPrice - bundlePrice)*viableForDiscount;
-        return new Discount(product, quantityInBundle+" for " + bundlePrice, -disAmount);
+    public Discount getDiscount(Product product) {
+        int viableForDiscount = ((int)product.getQuantity())/quantityInBundle;
+        double disAmount = (quantityInBundle* product.getPrice() - bundlePrice)*viableForDiscount;
+        return new Discount(product, quantityInBundle + " for " + bundlePrice, -disAmount);
     }
 }

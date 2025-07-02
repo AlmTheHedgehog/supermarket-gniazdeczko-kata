@@ -1,7 +1,7 @@
 package dojo.supermarket.model.offer;
 
 import dojo.supermarket.model.Discount;
-import dojo.supermarket.model.Product;
+import dojo.supermarket.model.product.Product;
 
 public class PercentDiscountOffer implements Offer {
 
@@ -15,8 +15,8 @@ public class PercentDiscountOffer implements Offer {
 
 
     @Override
-    public Discount getDiscount(Product product, Double amountOfProduct, double productPrice) {
-        return new Discount(product, discountPercentage + "% off", -amountOfProduct * productPrice * discountFraction);
+    public Discount getDiscount(Product product) {
+        return new Discount(product, discountPercentage + "% off", -product.getQuantity() * product.getPrice() * discountFraction);
 
     }
 }

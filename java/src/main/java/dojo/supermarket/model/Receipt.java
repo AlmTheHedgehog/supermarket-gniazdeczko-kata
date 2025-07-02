@@ -1,33 +1,26 @@
 package dojo.supermarket.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import dojo.supermarket.model.product.Product;
+
+import java.util.*;
 
 public class Receipt {
 
-    private final List<ReceiptItem> items = new ArrayList<>();
+    private final Map<Product, Product> items = new HashMap<>();
     private final List<Discount> discounts = new ArrayList<>();
 
     //should be integer
     public double getTotalPrice() {
-        double total = 0.0;
-        for (ReceiptItem item : items) {
-            total += item.getTotalPrice();
-        }
-        for (Discount discount : discounts) {
-            total += discount.getDiscountAmount();
-        }
-        return total;
+        var costSum = items.keySet().stream().mapToDouble(Product::getTotalPrice).sum();
+        var discountsNegativeSum = discounts.stream().mapToDouble(Discount::discountAmount).sum();
+        return costSum +  discountsNegativeSum;
     }
 
-    public void addProduct(Product p, double quantity, double price, double totalPrice) {
-        items.add(new ReceiptItem(p, quantity, price, totalPrice));
-    }
-
-    public List<ReceiptItem> getItems() {
-        return Collections.unmodifiableList(items);
+    public void addProduct(Product product) {
+        var cartProduct = Optional.ofNullable(items.getOrDefault(product, null));
+        cartProduct.ifPresentOrElse(
+                presentProduct -> presentProduct.addQuantity(product.getQuantity()),
+                () -> items.put(product, product));
     }
 
     public void addDiscount(Discount discount) {
@@ -38,11 +31,9 @@ public class Receipt {
         return discounts;
     }
 
-    public void addProducts(Map<Product, Double> products, SupermarketCatalog catalog) {
-        products.forEach((product, quantity) -> {
-            double unitPrice = catalog.getUnitPrice(product);
-            double price = quantity * unitPrice;
-            this.addProduct(product, quantity, unitPrice, price);
-        });
+    public void addProducts(Map<Product, Product> products) {
+        products.keySet().forEach(this::addProduct);
     }
+
+    //TODO printReceipt
 }
