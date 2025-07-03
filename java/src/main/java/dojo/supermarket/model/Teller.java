@@ -22,10 +22,10 @@ public class Teller {
         List<ProductQuantity> productQuantities = theCart.getItems();
         for (ProductQuantity pq: productQuantities) {
             Product p = pq.getProduct();
-            double quantity = pq.getQuantity();
+            Quantity quantity = pq.getQuantity();
             double unitPrice = catalog.getUnitPrice(p);
-            double price = quantity * unitPrice;
-            receipt.addProduct(p, quantity, unitPrice, price);
+            double price = quantity.asDouble() * unitPrice;
+            receipt.addProduct(p, quantity.asDouble(), unitPrice, price);
         }
         theCart.handleOffers(receipt, offers, catalog);
 

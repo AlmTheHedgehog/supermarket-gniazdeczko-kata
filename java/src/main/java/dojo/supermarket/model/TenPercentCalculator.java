@@ -2,19 +2,10 @@ package dojo.supermarket.model;
 
 public class TenPercentCalculator implements DiscountCalculator{
 
-    @Override
-    public Discount calculate(Product p, Offer offer, int quantityAsInt, double unitPrice, double quantity) {
-        return null;
-    }
 
     @Override
-    public Discount calculate(Product p, Offer offer, double unitPrice, double quantity) {
-        return new Discount(p, offer.argument + "% off", -quantity * unitPrice * offer.argument / 100.0);
-    }
-
-    @Override
-    public Discount calculate(Product p, int quantityAsInt, double unitPrice, double quantity) {
-        return null;
+    public Discount calculate(Product p, Offer offer, Quantity quantity, double unitPrice) {
+        return new Discount(p, offer.argument + "% off", -quantity.asDouble() * unitPrice * offer.argument / 100.0);
     }
 
 }

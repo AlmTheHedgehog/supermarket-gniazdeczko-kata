@@ -9,58 +9,50 @@ import java.util.Map;
 public class ShoppingCart {
 
     private final List<ProductQuantity> items = new ArrayList<>();
-    private final Map<Product, Double> productQuantities = new HashMap<>();
+    private final Map<Product, Quantity> productQuantities = new HashMap<>();
 
     List<ProductQuantity> getItems() {
         return Collections.unmodifiableList(items);
     }
 
-    void addItem(Product product) {
-        addItemQuantity(product, 1.0);
-    }
-
-    Map<Product, Double> productQuantities() {
+    Map<Product, Quantity> productQuantities() {
         return Collections.unmodifiableMap(productQuantities);
     }
 
     public void addItemQuantity(Product product, double quantity) {
+        Quantity newQuantity =  new Quantity(quantity);
         items.stream().filter(productQ -> productQ.productEquals(product)).count();
-        items.add(new ProductQuantity(product, quantity));
+        items.add(new ProductQuantity(product, newQuantity));
         if (productQuantities.containsKey(product)) {
-            productQuantities.put(product, productQuantities.get(product) + quantity);
+            productQuantities.put(product, productQuantities.get(product).increaseQuantity(newQuantity));
         } else {
-            productQuantities.put(product, quantity);
+            productQuantities.put(product, newQuantity);
         }
     }
 
     void handleOffers(Receipt receipt, Map<Product, Offer> offers, SupermarketCatalog catalog) {
         for (Product p : productQuantities().keySet()) {
-            double quantity = productQuantities.get(p);
+            Quantity quantity = productQuantities.get(p);
             if (offers.containsKey(p)) {
                 Offer offer = offers.get(p);
-                double unitPrice = catalog.getUnitPrice(p);
-                int quantityAsInt = (int) quantity;
-                Discount discount = null;
-                if (offer.offerType == SpecialOfferType.TWO_FOR_AMOUNT && quantityAsInt >= 2) {
-                    var calculator = new TwoForAmountCalculator();
-                    discount = calculator.calculate(p, offer, quantityAsInt, unitPrice, quantity);
-                }
-                if (offer.offerType == SpecialOfferType.THREE_FOR_TWO && quantityAsInt > 2) {
-                    var calculator = new ThreeForTwoCalculator();
-                    discount = calculator.calculate(p, quantityAsInt, unitPrice, quantity);
-                }
-                if (offer.offerType == SpecialOfferType.TEN_PERCENT_DISCOUNT) {
-                    var calculator = new TenPercentCalculator();
-                    discount = calculator.calculate(p, offer, unitPrice, quantity);
-                }
-                if (offer.offerType == SpecialOfferType.FIVE_FOR_AMOUNT && quantityAsInt >= 5) {
-                    var calculator = new FiveForAmountCalculator();
-                    discount = calculator.calculate(p, offer, quantityAsInt, unitPrice, quantity);
-                }
 
+               offer.offerType.toAppliedOffer(quantity).ifPresent(appliedOffer -> {
+                   double unitPrice = catalog.getUnitPrice(p);
+                   var calculator = switch (appliedOffer.getOfferType()) {
+                       case TWO_FOR_AMOUNT -> new TwoForAmountCalculator();
+                       case THREE_FOR_TWO -> new ThreeForTwoCalculator();
+                       case TEN_PERCENT_DISCOUNT -> new TenPercentCalculator();
+                       case FIVE_FOR_AMOUNT -> new FiveForAmountCalculator();
+                   };
 
-                if (discount != null)
-                    receipt.addDiscount(discount);
+                   Discount discount = calculator.calculate(p, offer, quantity, unitPrice);
+
+                   if (discount != null) {  // TODO: discount is probably always not null
+                       receipt.addDiscount(discount);
+                   }
+
+               });
+
             }
         }
     }
