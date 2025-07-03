@@ -11,8 +11,7 @@ public class TwoForAmountCalculator implements DiscountCalculator {
 
     @Override
     public Discount calculate(Product product, Quantity quantity, double unitPrice) {
-        double discountAmount = calculateTotalDiscount(quantity, unitPrice, argument, discountableGroupSize);
-        return new Discount(product, "2 for " + argument, -discountAmount);
+        return calculateTotalDiscount(product, quantity, unitPrice, argument, discountableGroupSize);
     }
 
 }

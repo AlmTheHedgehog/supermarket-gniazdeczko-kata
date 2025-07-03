@@ -9,8 +9,7 @@ public class FiveForAmountCalculator implements DiscountCalculator {
     }
 
     public Discount calculate(Product product, Quantity quantity, double unitPrice) {
-        double discountAmount = calculateTotalDiscount(quantity, unitPrice, argument, discountableGroupSize);
-        return new Discount(product, discountableGroupSize + " for " + argument, -discountAmount);
+        return calculateTotalDiscount(product, quantity, unitPrice, argument, discountableGroupSize);
     }
 
 }
