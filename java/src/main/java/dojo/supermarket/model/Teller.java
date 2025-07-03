@@ -1,7 +1,6 @@
 package dojo.supermarket.model;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Teller {
@@ -13,21 +12,24 @@ public class Teller {
         this.catalog = catalog;
     }
 
+    //This method is exposed to external systems so no change into signature allowed
     public void addSpecialOffer(SpecialOfferType offerType, Product product, double argument) {
-        offers.put(product, new Offer(offerType, product, argument));
+        offers.put(product, new Offer(offerType, argument));
     }
 
     public Receipt checksOutArticlesFrom(ShoppingCart theCart) {
         Receipt receipt = new Receipt();
-        List<ProductQuantity> productQuantities = theCart.getItems();
-        for (ProductQuantity pq: productQuantities) {
-            Product p = pq.getProduct();
-            Quantity quantity = pq.getQuantity();
-            double unitPrice = catalog.getUnitPrice(p);
+        Map<Product, Quantity> productQuantities = theCart.productQuantities();
+        productQuantities.forEach((product, quantity) -> {
+            double unitPrice = catalog.getUnitPrice(product);
             double price = quantity.asDouble() * unitPrice;
-            receipt.addProduct(p, quantity.asDouble(), unitPrice, price);
-        }
-        theCart.handleOffers(receipt, offers, catalog);
+            receipt.addProduct(product, quantity.asDouble(), unitPrice, price);
+            OfferSelector offerSelector = new OfferSelector(offers);
+            offerSelector.selectOffer(product, quantity)
+                    .map(CalculatorFactory::instanceOf)
+                    .map(calculator -> calculator.calculate(product, quantity, unitPrice))
+                    .ifPresent(receipt::addDiscount);
+        });
 
         return receipt;
     }

@@ -2,6 +2,6 @@ package dojo.supermarket.model;
 
 public interface DiscountCalculator {
 
-    public Discount calculate(Product p, Offer offer, Quantity quantity, double unitPrice);
+    Discount calculate(Product product, Quantity quantity, double unitPrice);
 
 }

@@ -6,8 +6,7 @@ public enum SpecialOfferType {
     THREE_FOR_TWO (3),
     TEN_PERCENT_DISCOUNT (1),
     TWO_FOR_AMOUNT (2),
-    FIVE_FOR_AMOUNT (5),
-    ;
+    FIVE_FOR_AMOUNT (5);
 
     private final int groupingSize;
 
@@ -15,10 +14,9 @@ public enum SpecialOfferType {
         this.groupingSize = groupingSize;
     }
 
-
-    public Optional<AppliedOffer> toAppliedOffer(Quantity quantity) {
+    public Optional<AppliedOffer> toAppliedOffer(Quantity quantity, double argument) {
         if(groupingSize >= quantity.asDouble()) {
-            return Optional.of(new AppliedOffer(this));
+            return Optional.of(new AppliedOffer(this, argument));
         }  else {
             return Optional.empty();
         }

@@ -14,10 +14,6 @@ public class ProductQuantity {
         return product;
     }
 
-    public boolean productEquals(Object product){
-        return this.product.equals(product);
-    }
-
     public Quantity getQuantity() {
         return quantity;
     }
