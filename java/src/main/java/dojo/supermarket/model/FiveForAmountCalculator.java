@@ -1,6 +1,7 @@
 package dojo.supermarket.model;
 
 public class FiveForAmountCalculator implements DiscountCalculator {
+    private static final int discountableGroupSize = 5;
     private final double argument;
 
     public FiveForAmountCalculator(double argument) {
@@ -8,10 +9,8 @@ public class FiveForAmountCalculator implements DiscountCalculator {
     }
 
     public Discount calculate(Product product, Quantity quantity, double unitPrice) {
-        int discountableGroupSize = 5;
-        int nrOfDiscountableGroups = quantity.asInt() / discountableGroupSize;
-        double discountTotal = unitPrice * quantity.asDouble() - (argument * nrOfDiscountableGroups + quantity.asInt() % 5 * unitPrice);
-        return new Discount(product, discountableGroupSize + " for " + argument, -discountTotal);
+        double discountAmount = calculateTotalDiscount(quantity, unitPrice, argument, discountableGroupSize);
+        return new Discount(product, discountableGroupSize + " for " + argument, -discountAmount);
     }
 
 }
